@@ -1,17 +1,17 @@
 window.DASH_DATA = {
-  "updatedAt": "2026-08-14T10:44:01.530+08:00",
+  "updatedAt": "2026-08-14T10:45:53.893+08:00",
   "weather": {
     "ok": true,
     "description": "雷暴",
     "iconKey": "thunder",
-    "tempC": 30.3,
-    "feelsLikeC": 37.6,
+    "tempC": 30.5,
+    "feelsLikeC": 38.2,
     "humidity": 75,
-    "windKph": 2.2,
+    "windKph": 1.7,
     "windDir": "东南",
     "place": "宁波",
-    "observedAt": "2026-08-14T10:30",
-    "fetchedAt": "2026-08-14T10:44:01.527+08:00",
+    "observedAt": "2026-08-14T10:45",
+    "fetchedAt": "2026-08-14T10:45:53.890+08:00",
     "error": null
   },
   "sources": {
@@ -21,11 +21,11 @@ window.DASH_DATA = {
       "planName": "general · Token Plan",
       "planTotal": null,
       "planUsed": null,
-      "pct": 9,
+      "pct": 10,
       "windows": [
         {
           "name": "5小时",
-          "usedPct": 9,
+          "usedPct": 10,
           "resetAt": "2026-08-14T15:00:00.000+08:00"
         },
         {
@@ -34,7 +34,7 @@ window.DASH_DATA = {
           "resetAt": "2026-08-17T00:00:00.000+08:00"
         }
       ],
-      "fetchedAt": "2026-08-14T10:43:59.678+08:00",
+      "fetchedAt": "2026-08-14T10:45:52.622+08:00",
       "error": null
     }
   }
