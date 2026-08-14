@@ -1,17 +1,17 @@
 {
-  "updatedAt": "2026-08-14T10:02:12.961+08:00",
+  "updatedAt": "2026-08-14T10:43:46.236+08:00",
   "weather": {
     "ok": true,
-    "description": "小毛毛雨",
-    "iconKey": "rain",
-    "tempC": 29.7,
-    "feelsLikeC": 36.2,
-    "humidity": 77,
-    "windKph": 2.9,
+    "description": "雷暴",
+    "iconKey": "thunder",
+    "tempC": 30.3,
+    "feelsLikeC": 37.6,
+    "humidity": 75,
+    "windKph": 2.2,
     "windDir": "东南",
     "place": "宁波",
-    "observedAt": "2026-08-14T10:00",
-    "fetchedAt": "2026-08-14T10:02:12.958+08:00",
+    "observedAt": "2026-08-14T10:30",
+    "fetchedAt": "2026-08-14T10:43:46.234+08:00",
     "error": null
   },
   "sources": {
@@ -21,20 +21,20 @@
       "planName": "general · Token Plan",
       "planTotal": null,
       "planUsed": null,
-      "pct": 1,
+      "pct": 9,
       "windows": [
         {
           "name": "5小时",
-          "usedPct": 1,
+          "usedPct": 9,
           "resetAt": "2026-08-14T15:00:00.000+08:00"
         },
         {
           "name": "周",
-          "usedPct": 7,
+          "usedPct": 8,
           "resetAt": "2026-08-17T00:00:00.000+08:00"
         }
       ],
-      "fetchedAt": "2026-08-14T10:02:11.542+08:00",
+      "fetchedAt": "2026-08-14T10:43:43.979+08:00",
       "error": null
     }
   }
