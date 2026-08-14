@@ -245,8 +245,410 @@ body {
   <span id="dataStatus">等待实时数据</span>
 </div>
 
-<script src="data.js"></script>
-<script src="live-endpoint.js"></script>
-<script src="dashboard-runtime.js?v=20260814b"></script>
+
+
+<script>window.DASH_DATA = {
+  "updatedAt": "2026-08-14T14:01:01.717+08:00",
+  "weather": {
+    "ok": true,
+    "description": "闆锋毚鍐伴浌",
+    "iconKey": "thunder",
+    "tempC": 27.9,
+    "feelsLikeC": 34.2,
+    "humidity": 89,
+    "windKph": 7.3,
+    "windDir": "涓滃寳",
+    "place": "瀹佹尝",
+    "observedAt": "2026-08-14T14:00",
+    "fetchedAt": "2026-08-14T14:01:01.714+08:00",
+    "error": null
+  },
+  "sources": {
+    "minimax": {
+      "ok": true,
+      "label": "MiniMax",
+      "planName": "general 路 Token Plan",
+      "planTotal": null,
+      "planUsed": null,
+      "pct": 41,
+      "windows": [
+        {
+          "name": "5灏忔椂",
+          "usedPct": 41,
+          "resetAt": "2026-08-14T15:00:00.000+08:00"
+        },
+        {
+          "name": "鍛?,
+          "usedPct": 11,
+          "resetAt": "2026-08-17T00:00:00.000+08:00"
+        }
+      ],
+      "fetchedAt": "2026-08-14T14:00:58.732+08:00",
+      "error": null
+    }
+  }
+};
+;</script>
+<script>
+(function (win, doc) {
+  'use strict';
+
+  var settings = {
+    fallbackData: 'https://singledog65.github.io/kindle-ai-quota-dashboard/data.js',
+    endpointPointer: 'live-endpoint.js',
+    pollEvery: 3 * 60 * 1000,
+    pollOffset: 5000,
+    quietStart: 3,
+    quietEnd: 8
+  };
+  var state = {
+    endpoint: win.DASH_LIVE_ENDPOINT || settings.fallbackData,
+    latest: null,
+    renderedAt: ''
+  };
+  var weekdays = ['鍛ㄦ棩', '鍛ㄤ竴', '鍛ㄤ簩', '鍛ㄤ笁', '鍛ㄥ洓', '鍛ㄤ簲', '鍛ㄥ叚'];
+
+  var ui = {
+    find: function (id) { return doc.getElementById(id); },
+    textNode: function (node, value) {
+      var next = String(value);
+      if (node && node.textContent !== next) node.textContent = next;
+    },
+    text: function (id, value) {
+      ui.textNode(ui.find(id), value);
+    },
+    html: function (node, value) {
+      if (node && node.innerHTML !== value) node.innerHTML = value;
+    },
+    className: function (node, value) {
+      if (node && node.className !== value) node.className = value;
+    },
+    style: function (node, name, value) {
+      if (node && node.style[name] !== value) node.style[name] = value;
+    },
+    attribute: function (node, name, value) {
+      var next = String(value);
+      if (node && node.getAttribute(name) !== next) node.setAttribute(name, next);
+    }
+  };
+
+  function twoDigits(value) {
+    return value < 10 ? '0' + value : String(value);
+  }
+
+  function timestamp(value) {
+    var parsed = Date.parse(value || '');
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  function clockText(value) {
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '--:--';
+    return twoDigits(date.getHours()) + ':' + twoDigits(date.getMinutes());
+  }
+
+  function isQuiet(date) {
+    var hour = (date || new Date()).getHours();
+    return hour >= settings.quietStart && hour < settings.quietEnd;
+  }
+
+  function millisecondsUntilMorning(date) {
+    var now = date || new Date();
+    var morning = new Date(
+      now.getFullYear(), now.getMonth(), now.getDate(),
+      settings.quietEnd, 0, 5, 0
+    );
+    return Math.max(1000, morning.getTime() - now.getTime());
+  }
+
+  function updateFreshness() {
+    var lastUpdate = state.latest && state.latest.updatedAt;
+    var age = lastUpdate
+      ? Math.floor((Date.now() - timestamp(lastUpdate)) / 60000)
+      : 99999;
+    var lastClock = clockText(lastUpdate);
+    var status = ui.find('dataStatus');
+    var alert = ui.find('dataAlert');
+
+    if (isQuiet()) {
+      ui.textNode(status, '澶滈棿鐪佺數 路 08:00 鎭㈠');
+      ui.className(status, '');
+      ui.textNode(alert, '');
+      ui.className(alert, 'data-alert');
+      return;
+    }
+
+    if (!state.latest || age > 15) {
+      ui.textNode(status, '绂荤嚎 路 鏈€鍚?' + lastClock);
+      ui.className(status, 'warn');
+      ui.textNode(alert, '鐢佃剳鎴栨暟鎹摼璺凡绂荤嚎 路 鏈€鍚庡湪绾?' + lastClock);
+      ui.className(alert, 'data-alert on');
+      return;
+    }
+
+    if (age >= 7) {
+      ui.textNode(status, '寤惰繜 ' + age + ' 鍒嗛挓 路 ' + lastClock);
+      ui.className(status, 'warn');
+      ui.textNode(alert, '瀹炴椂鏁版嵁寤惰繜 ' + age + ' 鍒嗛挓 路 姝ｅ湪鏄剧ず鏈€鍚庝竴娆＄粨鏋?);
+      ui.className(alert, 'data-alert on');
+      return;
+    }
+
+    ui.textNode(status, '瀹炴椂 路 ' + lastClock);
+    ui.className(status, '');
+    ui.textNode(alert, '');
+    ui.className(alert, 'data-alert');
+  }
+
+  function updateClock() {
+    var now = new Date();
+    ui.text('dtTime', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
+    ui.text('dtDate', now.getFullYear() + '骞? + (now.getMonth() + 1) + '鏈? + now.getDate() + '鏃?);
+    ui.text('dtWeek', weekdays[now.getDay()]);
+    updateFreshness();
+  }
+
+  function queryValue(name) {
+    var match = String(location.search || '').match(
+      new RegExp('[?&]' + name + '=([^&]*)')
+    );
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function updateBattery() {
+    var percentText = queryValue('battery');
+    var chargeText = queryValue('charging');
+    var percent = percentText !== null ? Number(percentText) : null;
+    var charging = chargeText === '1';
+    var device = win.KINDLE_DEVICE;
+
+    if (device) {
+      if (typeof device.battery === 'number') percent = device.battery;
+      if (typeof device.charging === 'boolean') charging = device.charging;
+      if (device.charging === 0 || device.charging === 1) charging = device.charging === 1;
+    }
+    if (percent === null || isNaN(percent)) return;
+
+    percent = Math.max(0, Math.min(100, percent));
+    ui.text('batPct', (charging ? '鈿?' : '') + percent + '%');
+    ui.attribute(ui.find('batFill'), 'width', Math.round(18 * percent / 100));
+  }
+
+  function attachScript(url, onSuccess, onFailure) {
+    var script = doc.createElement('script');
+    script.async = true;
+    script.src = url;
+    script.onload = function () {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (onSuccess) onSuccess();
+    };
+    script.onerror = function () {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (onFailure) onFailure();
+    };
+    doc.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  function requestDeviceStatus() {
+    attachScript('device-status.js?_=' + Date.now(), updateBattery);
+  }
+
+  function selectWeatherIcon(key, description) {
+    var text = (String(key || '') + ' ' + String(description || '')).toLowerCase();
+    if (/thunder|闆?.test(text)) return '蠠';
+    if (/snow|闆?.test(text)) return '鉂?;
+    if (/rain|wet|闆?.test(text)) return '鈽?;
+    if (/fog|mist|haze|闆?.test(text)) return '鈮?;
+    if (/clear|sun|鏅?.test(text)) return '鈽€';
+    return '鈽?;
+  }
+
+  function formatTokenCount(value) {
+    var n = Number(value);
+    if (!isFinite(n) || n < 0) return '--';
+    if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'K';
+    return String(Math.round(n));
+  }
+
+  function updateWeather(weather) {
+    if (!weather || !weather.ok) {
+      ui.text('weatherTemp', '--掳');
+      ui.text('weatherIcon', '鈼?);
+      ui.text('weatherDesc', '澶╂皵鏈厤缃?);
+      ui.text('weatherSub', '绛夊緟涓嬫閲囬泦');
+      return;
+    }
+    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '掳');
+    ui.text('weatherIcon', selectWeatherIcon(weather.iconKey, weather.description));
+    ui.text('weatherDesc', String(weather.description || '澶╂皵'));
+    var feels = weather.feelsLikeC != null ? '浣撴劅 ' + Math.round(weather.feelsLikeC) + '掳' : '';
+    var hum = weather.humidity != null ? '婀垮害 ' + Math.round(weather.humidity) + '%' : '';
+    var wind = weather.windKph != null ? '椋?' + Math.round(weather.windKph) + 'km/h' : '';
+    var place = weather.place ? '路 ' + weather.place : '';
+    var sub = [feels, hum, wind + (place ? ' ' + place : '')].filter(Boolean).join(' 路 ');
+    ui.text('weatherSub', sub || ' ');
+  }
+
+  function remainingText(value) {
+    var remaining = timestamp(value) - Date.now();
+    if (!value || !remaining) return '';
+    if (remaining <= 0) return '鈫?鍗冲皢鍒锋柊';
+    var minutes = Math.ceil(remaining / 60000);
+    var days = Math.floor(minutes / 1440);
+    var hours = Math.floor((minutes % 1440) / 60);
+    minutes %= 60;
+    if (days) return '鈫?' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
+    if (hours) return '鈫?' + hours + 'h' + twoDigits(minutes) + 'm';
+    return '鈫?' + minutes + 'm';
+  }
+
+  function windowLabel(name) {
+    var text = String(name || '');
+    if (/5灏忔椂|5H/i.test(text)) return { id: 'w5hPct', fill: 'w5h' };
+    if (/7澶﹟鍛▅WEEK/i.test(text)) return { id: 'wwPct', fill: 'ww' };
+    if (/鏈坾MONTH/i.test(text)) return { id: 'wmPct', fill: 'wm' };
+    return null;
+  }
+
+  function updateMainCard(source) {
+    if (!source || !source.ok) {
+      ui.text('mPctNum', '--');
+      ui.text('mPctText', '--%');
+      ui.text('mPlanName', '绛夊緟鏁版嵁');
+      ui.text('mPctSub', '瀹炴椂');
+      ui.style(ui.find('mBarFill'), 'width', '0%');
+      ['w5hPct', 'wwPct', 'wmPct'].forEach(function (id) {
+        ui.text(id, '--%');
+      });
+      var emptyFills = doc.querySelectorAll('[data-fill]');
+      for (var i = 0; i < emptyFills.length; i += 1) {
+        ui.style(emptyFills[i], 'width', '0%');
+      }
+      return;
+    }
+
+    var pct = Math.max(0, Math.min(100, Number(source.pct) || 0));
+    ui.text('mPctNum', String(Math.round(pct)));
+    ui.text('mPctText', String(Math.round(pct)) + '%');
+    ui.text('mPlanName', String(source.planName || source.label || 'Token Plan'));
+    ui.style(ui.find('mBarFill'), 'width', pct + '%');
+    ui.text('mPctSub', '瀹炴椂');
+
+    var windows = Array.isArray(source.windows) ? source.windows : [];
+    var usedFills = {};
+    for (var w = 0; w < windows.length; w += 1) {
+      var win = windows[w];
+      var slot = windowLabel(win.name);
+      if (!slot) continue;
+      var wPct = Math.max(0, Math.min(100, Number(win.usedPct) || 0));
+      ui.text(slot.id, String(Math.round(wPct)) + '%');
+      usedFills[slot.fill] = wPct;
+    }
+    var allFills = doc.querySelectorAll('[data-fill]');
+    for (var f = 0; f < allFills.length; f += 1) {
+      var key = allFills[f].getAttribute('data-fill');
+      var val = usedFills[key];
+      ui.style(allFills[f], 'width', (val != null ? val : 0) + '%');
+    }
+  }
+
+  function present(data) {
+    if (!data || !data.updatedAt || !data.sources) return;
+    if (state.renderedAt && timestamp(data.updatedAt) < timestamp(state.renderedAt)) return;
+
+    state.latest = data;
+    if (data.updatedAt !== state.renderedAt) {
+      state.renderedAt = data.updatedAt;
+      updateWeather(data.weather);
+      updateMainCard(data.sources.minimax);
+    }
+    updateFreshness();
+  }
+
+  function requestData(url, canFallback) {
+    var separator;
+    if (!url || url.indexOf('__LIVE_') === 0) return;
+    separator = url.indexOf('?') < 0 ? '?' : '&';
+    attachScript(
+      url + separator + '_=' + Date.now(),
+      function () { present(win.DASH_DATA); },
+      function () {
+        if (canFallback && url !== settings.fallbackData) {
+          requestData(settings.fallbackData, false);
+        }
+      }
+    );
+  }
+
+  function refresh() {
+    requestDeviceStatus();
+    attachScript(
+      settings.endpointPointer + '?_=' + Date.now(),
+      function () {
+        var supplied = win.DASH_LIVE_ENDPOINT || '';
+        if (supplied && supplied.indexOf('__LIVE_') !== 0) state.endpoint = supplied;
+        requestData(state.endpoint, true);
+      },
+      function () {
+        state.endpoint = settings.fallbackData;
+        requestData(state.endpoint, false);
+      }
+    );
+  }
+
+  function scheduleRefresh() {
+    var now = new Date();
+    var milliseconds = now.getTime();
+    var delay;
+
+    if (isQuiet(now)) {
+      delay = millisecondsUntilMorning(now);
+    } else {
+      delay = (
+        settings.pollOffset -
+        (milliseconds % settings.pollEvery) +
+        settings.pollEvery
+      ) % settings.pollEvery;
+      if (delay < 250) delay += settings.pollEvery;
+    }
+
+    setTimeout(function () {
+      if (!isQuiet()) refresh();
+      scheduleRefresh();
+    }, delay);
+  }
+
+  function scheduleMinuteClock() {
+    var now = new Date();
+    var delay = isQuiet(now)
+      ? millisecondsUntilMorning(now)
+      : 60000 - (now.getTime() % 60000) + 100;
+    setTimeout(function () {
+      updateClock();
+      scheduleMinuteClock();
+  // === 禁屏保 ===
+  function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
+  setInterval(keepAwake, 60*1000);
+  setTimeout(keepAwake, 5000);
+
+    }, delay);
+  }
+
+  present(win.DASH_DATA);
+  updateClock();
+  updateBattery();
+  if (!isQuiet()) refresh();
+  scheduleRefresh();
+  scheduleMinuteClock();
+  // === 禁屏保 ===
+  function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
+  setInterval(keepAwake, 60*1000);
+  setTimeout(keepAwake, 5000);
+
+}(window, document));
+
+</script>
 </body>
 </html>
