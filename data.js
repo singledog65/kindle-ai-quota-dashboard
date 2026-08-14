@@ -1,5 +1,5 @@
 window.DASH_DATA = {
-  "updatedAt": "2026-08-14T10:43:46.236+08:00",
+  "updatedAt": "2026-08-14T10:44:01.530+08:00",
   "weather": {
     "ok": true,
     "description": "雷暴",
@@ -11,7 +11,7 @@ window.DASH_DATA = {
     "windDir": "东南",
     "place": "宁波",
     "observedAt": "2026-08-14T10:30",
-    "fetchedAt": "2026-08-14T10:43:46.234+08:00",
+    "fetchedAt": "2026-08-14T10:44:01.527+08:00",
     "error": null
   },
   "sources": {
@@ -34,7 +34,7 @@ window.DASH_DATA = {
           "resetAt": "2026-08-17T00:00:00.000+08:00"
         }
       ],
-      "fetchedAt": "2026-08-14T10:43:43.979+08:00",
+      "fetchedAt": "2026-08-14T10:43:59.678+08:00",
       "error": null
     }
   }
