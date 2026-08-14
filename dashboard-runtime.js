@@ -109,14 +109,10 @@
   }
 
   function updateClock() {
-    // 主显数据时间(来自 GitHub Pages,准时),Kindle 本地时间在 dtLocal 副显
-    var lastUpdate = state.latest && state.latest.updatedAt;
     var now = new Date();
-    var dt = lastUpdate ? new Date(lastUpdate) : now;
-    ui.text('dtTime', twoDigits(dt.getHours()) + ':' + twoDigits(dt.getMinutes()));
-    ui.text('dtDate', dt.getFullYear() + '年' + (dt.getMonth() + 1) + '月' + dt.getDate() + '日');
-    ui.text('dtWeek', weekdays[dt.getDay()]);
-    ui.text('dtLocal', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
+    ui.text('dtTime', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
+    ui.text('dtDate', now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日');
+    ui.text('dtWeek', weekdays[now.getDay()]);
     updateFreshness();
   }
 
@@ -350,19 +346,3 @@
   scheduleRefresh();
   scheduleMinuteClock();
 }(window, document));
-
-  // 每 30 分钟后台拉新 data.js（不刷新页面）
-  setInterval(function () {
-    var s = doc.createElement('script');
-    s.async = true;
-    s.src = (state.endpoint || 'data.js') + '?t=' + Date.now();
-    s.onload = function () {
-      if (s.parentNode) s.parentNode.removeChild(s);
-      if (win.DASH_DATA && win.DASH_DATA.updatedAt) {
-        present(win.DASH_DATA);
-        updateClock();
-      }
-    };
-    s.onerror = function () { if (s.parentNode) s.parentNode.removeChild(s); };
-    doc.getElementsByTagName('head')[0].appendChild(s);
-  }, 30 * 60 * 1000);
