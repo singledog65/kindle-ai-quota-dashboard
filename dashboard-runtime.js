@@ -17,9 +17,7 @@
   var weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
 
   var ui = {
-    find: function (id) {
-      return doc.getElementById(id);
-    },
+    find: function (id) { return doc.getElementById(id); },
     textNode: function (node, value) {
       var next = String(value);
       if (node && node.textContent !== next) node.textContent = next;
@@ -65,13 +63,8 @@
   function millisecondsUntilMorning(date) {
     var now = date || new Date();
     var morning = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      settings.quietEnd,
-      0,
-      5,
-      0
+      now.getFullYear(), now.getMonth(), now.getDate(),
+      settings.quietEnd, 0, 5, 0
     );
     return Math.max(1000, morning.getTime() - now.getTime());
   }
@@ -85,12 +78,8 @@
     var status = ui.find('dataStatus');
     var alert = ui.find('dataAlert');
 
-    if (state.latest) {
-      ui.text('relTime', age < 1 ? '刚刚更新' : age + '分钟前更新');
-    }
-
     if (isQuiet()) {
-      ui.textNode(status, '夜间省电 · 08:00恢复');
+      ui.textNode(status, '夜间省电 · 08:00 恢复');
       ui.className(status, '');
       ui.textNode(alert, '');
       ui.className(alert, 'data-alert');
@@ -172,91 +161,6 @@
     attachScript('device-status.js?_=' + Date.now(), updateBattery);
   }
 
-  function windowTitle(value) {
-    var name = String(value || '');
-    if (/5小时|5H/i.test(name)) return '5H QUOTA';
-    if (/7天|周|WEEK/i.test(name)) return 'WEEKLY';
-    if (/月|MONTH/i.test(name)) return 'MONTHLY';
-    return name || 'QUOTA';
-  }
-
-  function remainingTime(value) {
-    var remaining = timestamp(value) - Date.now();
-    var minutes;
-    var days;
-    var hours;
-    if (!value || !remaining) return '↻ 未提供刷新时间';
-    if (remaining <= 0) return '↻ 即将刷新';
-
-    minutes = Math.ceil(remaining / 60000);
-    days = Math.floor(minutes / 1440);
-    hours = Math.floor((minutes % 1440) / 60);
-    minutes %= 60;
-    if (days) return '↻ ' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
-    if (hours) return '↻ ' + hours + 'h' + twoDigits(minutes) + 'm';
-    return '↻ ' + minutes + 'm';
-  }
-
-  function showUnavailableQuota(rows) {
-    var labels;
-    if (!rows.length) return;
-    ui.style(rows[0], 'display', 'block');
-    labels = rows[0].querySelectorAll('.q-label span');
-    if (labels.length > 1) {
-      ui.textNode(labels[0], '获取失败');
-      ui.textNode(labels[1], '--');
-    }
-    ui.style(rows[0].querySelector('.q-bar-fill'), 'width', '0%');
-    ui.textNode(rows[0].querySelector('.q-refresh'), '↻ 等待下次采集');
-  }
-
-  function updateQuotaCard(cardId, source) {
-    var card = ui.find(cardId);
-    var rows;
-    var windows;
-    var index;
-    if (!card) return;
-
-    rows = card.querySelectorAll('.q-row');
-    windows = source && source.ok && source.windows ? source.windows : [];
-    for (index = 0; index < rows.length; index += 1) {
-      var quotaWindow;
-      var labels;
-      var percentage;
-      if (index >= windows.length) {
-        ui.style(rows[index], 'display', 'none');
-        continue;
-      }
-
-      quotaWindow = windows[index];
-      ui.style(rows[index], 'display', 'block');
-      labels = rows[index].querySelectorAll('.q-label span');
-      if (labels.length > 1) {
-        ui.textNode(labels[0], windowTitle(quotaWindow.name));
-        ui.textNode(
-          labels[1],
-          quotaWindow.displayValue != null
-            ? String(quotaWindow.displayValue)
-            : Math.round(Number(quotaWindow.usedPct) || 0) + '%'
-        );
-      }
-
-      percentage = quotaWindow.barPct != null
-        ? quotaWindow.barPct
-        : quotaWindow.usedPct;
-      ui.style(
-        rows[index].querySelector('.q-bar-fill'),
-        'width',
-        Math.max(0, Math.min(100, Number(percentage) || 0)) + '%'
-      );
-      ui.textNode(
-        rows[index].querySelector('.q-refresh'),
-        quotaWindow.detailText || remainingTime(quotaWindow.resetAt)
-      );
-    }
-    if (!windows.length) showUnavailableQuota(rows);
-  }
-
   function selectWeatherIcon(key, description) {
     var text = (String(key || '') + ' ' + String(description || '')).toLowerCase();
     if (/thunder|雷/.test(text)) return 'ϟ';
@@ -267,45 +171,98 @@
     return '☁';
   }
 
-  function updateWeather(weather) {
-    if (!weather || !weather.ok) return;
-    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '°');
-    ui.html(
-      ui.find('weatherIcon'),
-      '<span style="font-size:30px;line-height:1">' +
-        selectWeatherIcon(weather.iconKey, weather.description) +
-      '</span>'
-    );
-    ui.html(
-      ui.find('weatherDetail'),
-      String(weather.description || '天气') +
-        ' · 体感 ' + Math.round(Number(weather.feelsLikeC)) +
-        '° · 湿度 ' + Math.round(Number(weather.humidity)) +
-        '%<br>风 ' + Math.round(Number(weather.windKph)) +
-        'km/h · ' + String(weather.place || '北京')
-    );
+  function formatTokenCount(value) {
+    var n = Number(value);
+    if (!isFinite(n) || n < 0) return '--';
+    if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'K';
+    return String(Math.round(n));
   }
 
-  function updateBalance(source) {
-    if (source && source.ok && typeof source.balance === 'number') {
-      ui.text('deepSeekBalance', '¥ ' + Number(source.balance).toFixed(2));
-      ui.text('deepSeekDetail', '实时余额 · 按量计费');
+  function updateWeather(weather) {
+    if (!weather || !weather.ok) {
+      ui.text('weatherTemp', '--°');
+      ui.text('weatherIcon', '○');
+      ui.text('weatherDesc', '天气未配置');
+      ui.text('weatherSub', '等待下次采集');
       return;
     }
-    ui.text('deepSeekBalance', '¥ --');
-    ui.text('deepSeekDetail', '获取失败 · 等待下次采集');
+    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '°');
+    ui.text('weatherIcon', selectWeatherIcon(weather.iconKey, weather.description));
+    ui.text('weatherDesc', String(weather.description || '天气'));
+    var feels = weather.feelsLikeC != null ? '体感 ' + Math.round(weather.feelsLikeC) + '°' : '';
+    var hum = weather.humidity != null ? '湿度 ' + Math.round(weather.humidity) + '%' : '';
+    var wind = weather.windKph != null ? '风 ' + Math.round(weather.windKph) + 'km/h' : '';
+    var place = weather.place ? '· ' + weather.place : '';
+    var sub = [feels, hum, wind + (place ? ' ' + place : '')].filter(Boolean).join(' · ');
+    ui.text('weatherSub', sub || ' ');
   }
 
-  function updateQuote(quote) {
-    if (!quote || !quote.text) return;
-    ui.textNode(doc.querySelector('.quote-text'), quote.text);
-    if (quote.source) {
-      ui.textNode(doc.querySelector('.quote-src'), '— ' + quote.source);
+  function remainingText(value) {
+    var remaining = timestamp(value) - Date.now();
+    if (!value || !remaining) return '';
+    if (remaining <= 0) return '↻ 即将刷新';
+    var minutes = Math.ceil(remaining / 60000);
+    var days = Math.floor(minutes / 1440);
+    var hours = Math.floor((minutes % 1440) / 60);
+    minutes %= 60;
+    if (days) return '↻ ' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
+    if (hours) return '↻ ' + hours + 'h' + twoDigits(minutes) + 'm';
+    return '↻ ' + minutes + 'm';
+  }
+
+  function windowLabel(name) {
+    var text = String(name || '');
+    if (/5小时|5H/i.test(text)) return { id: 'w5hPct', fill: 'w5h' };
+    if (/7天|周|WEEK/i.test(text)) return { id: 'wwPct', fill: 'ww' };
+    if (/月|MONTH/i.test(text)) return { id: 'wmPct', fill: 'wm' };
+    return null;
+  }
+
+  function updateMainCard(source) {
+    if (!source || !source.ok) {
+      ui.text('mPctNum', '--');
+      ui.text('mPctText', '--%');
+      ui.text('mPlanName', '等待数据');
+      ui.text('mPctSub', '实时');
+      ui.style(ui.find('mBarFill'), 'width', '0%');
+      ['w5hPct', 'wwPct', 'wmPct'].forEach(function (id) {
+        ui.text(id, '--%');
+      });
+      var emptyFills = doc.querySelectorAll('[data-fill]');
+      for (var i = 0; i < emptyFills.length; i += 1) {
+        ui.style(emptyFills[i], 'width', '0%');
+      }
+      return;
+    }
+
+    var pct = Math.max(0, Math.min(100, Number(source.pct) || 0));
+    ui.text('mPctNum', String(Math.round(pct)));
+    ui.text('mPctText', String(Math.round(pct)) + '%');
+    ui.text('mPlanName', String(source.planName || source.label || 'Token Plan'));
+    ui.style(ui.find('mBarFill'), 'width', pct + '%');
+    ui.text('mPctSub', '实时');
+
+    var windows = Array.isArray(source.windows) ? source.windows : [];
+    var usedFills = {};
+    for (var w = 0; w < windows.length; w += 1) {
+      var win = windows[w];
+      var slot = windowLabel(win.name);
+      if (!slot) continue;
+      var wPct = Math.max(0, Math.min(100, Number(win.usedPct) || 0));
+      ui.text(slot.id, String(Math.round(wPct)) + '%');
+      usedFills[slot.fill] = wPct;
+    }
+    var allFills = doc.querySelectorAll('[data-fill]');
+    for (var f = 0; f < allFills.length; f += 1) {
+      var key = allFills[f].getAttribute('data-fill');
+      var val = usedFills[key];
+      ui.style(allFills[f], 'width', (val != null ? val : 0) + '%');
     }
   }
 
   function present(data) {
-    var relativeNode;
     if (!data || !data.updatedAt || !data.sources) return;
     if (state.renderedAt && timestamp(data.updatedAt) < timestamp(state.renderedAt)) return;
 
@@ -313,13 +270,7 @@
     if (data.updatedAt !== state.renderedAt) {
       state.renderedAt = data.updatedAt;
       updateWeather(data.weather);
-      updateQuotaCard('cardClaude', data.sources.claude);
-      updateQuotaCard('cardCodex', data.sources.codex);
-      updateQuotaCard('cardKimi', data.sources.kimi);
-      updateBalance(data.sources.deepseek);
-      updateQuote(data.quote);
-      relativeNode = ui.find('relTime');
-      if (relativeNode) ui.attribute(relativeNode, 'data-ts', data.updatedAt);
+      updateMainCard(data.sources.minimax);
     }
     updateFreshness();
   }
@@ -330,9 +281,7 @@
     separator = url.indexOf('?') < 0 ? '?' : '&';
     attachScript(
       url + separator + '_=' + Date.now(),
-      function () {
-        present(win.DASH_DATA);
-      },
+      function () { present(win.DASH_DATA); },
       function () {
         if (canFallback && url !== settings.fallbackData) {
           requestData(settings.fallbackData, false);

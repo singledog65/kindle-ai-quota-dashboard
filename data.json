@@ -1,0 +1,41 @@
+{
+  "updatedAt": "2026-08-14T10:02:12.961+08:00",
+  "weather": {
+    "ok": true,
+    "description": "小毛毛雨",
+    "iconKey": "rain",
+    "tempC": 29.7,
+    "feelsLikeC": 36.2,
+    "humidity": 77,
+    "windKph": 2.9,
+    "windDir": "东南",
+    "place": "宁波",
+    "observedAt": "2026-08-14T10:00",
+    "fetchedAt": "2026-08-14T10:02:12.958+08:00",
+    "error": null
+  },
+  "sources": {
+    "minimax": {
+      "ok": true,
+      "label": "MiniMax",
+      "planName": "general · Token Plan",
+      "planTotal": null,
+      "planUsed": null,
+      "pct": 1,
+      "windows": [
+        {
+          "name": "5小时",
+          "usedPct": 1,
+          "resetAt": "2026-08-14T15:00:00.000+08:00"
+        },
+        {
+          "name": "周",
+          "usedPct": 7,
+          "resetAt": "2026-08-17T00:00:00.000+08:00"
+        }
+      ],
+      "fetchedAt": "2026-08-14T10:02:11.542+08:00",
+      "error": null
+    }
+  }
+}

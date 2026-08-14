@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>MiniMax 用量 · Kindle</title>
+<style>
+:root {
+  --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
+  --faint: #AAAAAA; --border: #888888; --border-light: #CCCCCC;
+  --bar-bg: #E0E0E0; --bar-fill: #000000; --card-bg: #F6F6F6;
+  --accent: #1A1A1A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --fg: #EAEAEA; --mid: #B0B0B0; --light: #808080;
+    --faint: #4A4A4A; --border: #2E2E2E; --border-light: #1F1F1F;
+    --bar-bg: #262626; --bar-fill: #DADADA; --card-bg: #1A1A1A;
+    --accent: #FAFAFA;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --fg: #EAEAEA; --mid: #B0B0B0; --light: #808080;
+  --faint: #4A4A4A; --border: #2E2E2E; --border-light: #1F1F1F;
+  --bar-bg: #262626; --bar-fill: #DADADA; --card-bg: #1A1A1A;
+  --accent: #FAFAFA;
+}
+:root[data-theme="light"] {
+  --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
+  --faint: #AAAAAA; --border: #888888; --border-light: #CCCCCC;
+  --bar-bg: #E0E0E0; --bar-fill: #000000; --card-bg: #F6F6F6;
+  --accent: #1A1A1A;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: Georgia, 'Noto Serif SC', 'SimSun', serif;
+  background: var(--bg); color: var(--fg);
+  width: 600px; height: 800px; overflow: hidden;
+  padding: 16px 22px 12px; display: flex; flex-direction: column;
+  line-height: 1.3;
+  gap: 10px;
+}
+.sans { font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif; }
+.mono { font-family: 'Consolas', 'Courier New', monospace; font-variant-numeric: tabular-nums; }
+
+/* ===== Top status row ===== */
+.top-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 14px; color: var(--mid);
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+.top-row .time { font-size: 18px; color: var(--fg); font-weight: 600; }
+.top-row .date { margin-left: 8px; }
+.top-row .week { margin-left: 6px; color: var(--light); }
+.top-row .batt { display: flex; align-items: center; gap: 4px; color: var(--light); }
+.top-row .batt svg { width: 18px; height: 12px; }
+
+/* ===== Weather card (独立模块) ===== */
+.weather-card {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  padding: 12px 16px;
+  flex-shrink: 0;
+}
+.w-left {
+  display: flex; align-items: center; gap: 6px;
+}
+.w-icon { font-size: 30px; line-height: 1; color: var(--mid); }
+.w-temp { font-size: 32px; font-weight: 700; line-height: 1; color: var(--fg); }
+.w-temp .deg { font-size: 18px; font-weight: 600; vertical-align: top; }
+.w-right { color: var(--mid); font-size: 14px; }
+.w-desc { font-size: 16px; color: var(--fg); font-weight: 600; margin-bottom: 3px; }
+.w-sub { color: var(--light); font-size: 12px; line-height: 1.4; }
+
+/* ===== Main quota card ===== */
+.main-card {
+  flex: 1;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  padding: 18px 22px 20px;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.m-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.m-title {
+  font-size: 22px; font-weight: 700; color: var(--fg);
+  letter-spacing: 0.02em;
+}
+.m-plan {
+  font-size: 13px; color: var(--light);
+}
+
+.m-pct {
+  text-align: center;
+  font-size: 108px; font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  margin: 4px 0 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.m-pct .pct-sign { font-size: 54px; font-weight: 700; vertical-align: top; margin-left: 2px; }
+
+.m-bar {
+  height: 16px;
+  background: var(--bar-bg);
+  border: 1px solid var(--border);
+  margin: 0 0 10px;
+  flex-shrink: 0;
+}
+.m-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.m-tokens {
+  text-align: center;
+  font-size: 16px; color: var(--mid);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+.m-tokens .used { color: var(--fg); font-weight: 600; }
+.m-tokens .sep { color: var(--faint); margin: 0 6px; }
+.m-tokens .label { color: var(--light); font-size: 13px; margin-left: 4px; }
+
+.windows {
+  border-top: 1px solid var(--border-light);
+  padding-top: 14px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+.win {
+  display: grid;
+  grid-template-columns: 64px 1fr 70px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.win:last-child { margin-bottom: 0; }
+.win-name { color: var(--light); letter-spacing: 0.04em; font-weight: 600; }
+.win-bar { height: 10px; background: var(--bar-bg); }
+.win-bar-fill { height: 100%; background: var(--accent); }
+.win-pct { text-align: right; font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
+.win-reset { grid-column: 2 / 4; font-size: 11px; color: var(--light); text-align: right; margin-top: -6px; }
+
+/* ===== Footer ===== */
+.footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 4px;
+  font-size: 11px; color: var(--light);
+  flex-shrink: 0;
+}
+.footer .label { font-weight: 600; }
+.footer .warn { color: var(--fg); font-weight: 700; }
+
+.data-alert {
+  display: none; margin: 0; padding: 4px 8px;
+  border: 2px solid var(--fg); text-align: center;
+  font: 700 12px/1.3 Arial, 'Microsoft YaHei', sans-serif;
+  color: var(--bg); background: var(--fg);
+  flex-shrink: 0;
+}
+.data-alert.on { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ===== Top status row ===== -->
+<div class="top-row sans">
+  <div>
+    <span class="time mono" id="dtTime">--:--</span>
+    <span class="date" id="dtDate">----年--月--日</span>
+    <span class="week" id="dtWeek">---</span>
+  </div>
+  <div class="batt" id="dtBattery">
+    <svg viewBox="-0.5 0 28 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="0" y="1" width="22" height="12" rx="2"/><rect x="22" y="4" width="3" height="6" rx="1"/><rect x="2" y="3" width="11" height="8" fill="currentColor" stroke="none" id="batFill"/></svg>
+    <span id="batPct">--%</span>
+  </div>
+</div>
+
+<!-- ===== Weather card (模块 1) ===== -->
+<div class="weather-card sans">
+  <div class="w-left">
+    <span class="w-icon" id="weatherIcon">☀</span>
+    <span class="w-temp mono"><span id="weatherTemp">--</span><span class="deg">°</span></span>
+  </div>
+  <div class="w-right">
+    <div class="w-desc" id="weatherDesc">天气</div>
+    <div class="w-sub" id="weatherSub">体感 --° · 湿度 --% · 等待数据</div>
+  </div>
+</div>
+
+<div class="data-alert" id="dataAlert"></div>
+
+<!-- ===== Main quota card (模块 2) ===== -->
+<div class="main-card">
+  <div class="m-head sans">
+    <span class="m-title">MiniMax M3</span>
+    <span class="m-plan" id="mPlan">Token Plan · <span id="mPlanName">--</span></span>
+  </div>
+
+  <div class="m-pct mono"><span id="mPctNum">--</span><span class="pct-sign">%</span></div>
+
+  <div class="m-bar"><div class="m-bar-fill" id="mBarFill" style="width:0%"></div></div>
+
+  <div class="m-tokens mono sans">
+    <span>本套餐已用</span>
+    <span class="used" id="mPctText">--%</span>
+    <span class="sep">·</span>
+    <span class="label" id="mPctSub">实时</span>
+  </div>
+
+  <div class="windows" id="windows">
+    <div class="win">
+      <span class="win-name sans">5小时</span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="w5h" style="width:0%"></span></span>
+      <span class="win-pct mono" id="w5hPct">--%</span>
+    </div>
+    <div class="win">
+      <span class="win-name sans">周</span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="ww" style="width:0%"></span></span>
+      <span class="win-pct mono" id="wwPct">--%</span>
+    </div>
+    <div class="win">
+      <span class="win-name sans">月</span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="wm" style="width:0%"></span></span>
+      <span class="win-pct mono" id="wmPct">--%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Footer ===== -->
+<div class="footer sans">
+  <span class="label">MiniMax 用量看板</span>
+  <span id="dataStatus">等待实时数据</span>
+</div>
+
+<script src="data.js"></script>
+<script src="live-endpoint.js"></script>
+<script src="dashboard-runtime.js?v=20260814b"></script>
+</body>
+</html>
