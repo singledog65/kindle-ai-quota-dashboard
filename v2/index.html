@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-<meta http-equiv="refresh" content="600"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>MiniMax 用量 · Kindle</title>
+<meta http-equiv="refresh" content="600"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>MiniMax 鐢ㄩ噺 路 Kindle</title>
 <style>
 :root {
   --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
@@ -57,7 +57,7 @@ body {
 .top-row .batt { display: flex; align-items: center; gap: 4px; color: var(--light); }
 .top-row .batt svg { width: 18px; height: 12px; }
 
-/* ===== Weather card (独立模块) ===== */
+/* ===== Weather card (鐙珛妯″潡) ===== */
 .weather-card {
   display: grid;
   grid-template-columns: 70px 1fr;
@@ -179,7 +179,7 @@ body {
 <div class="top-row sans">
   <div>
     <span class="time mono" id="dtTime">--:--</span><span class="local mono" id="dtLocal" style="font-size:11px;color:#aaa;margin-left:4px"></span>
-    <span class="date" id="dtDate">----年--月--日</span>
+    <span class="date" id="dtDate">----骞?-鏈?-鏃?/span>
     <span class="week" id="dtWeek">---</span>
   </div>
   <div class="batt" id="dtBattery">
@@ -188,25 +188,25 @@ body {
   </div>
 </div>
 
-<!-- ===== Weather card (模块 1) ===== -->
+<!-- ===== Weather card (妯″潡 1) ===== -->
 <div class="weather-card sans">
   <div class="w-left">
-    <span class="w-icon" id="weatherIcon">☀</span>
-    <span class="w-temp mono"><span id="weatherTemp">--</span><span class="deg">°</span></span>
+    <span class="w-icon" id="weatherIcon">鈽€</span>
+    <span class="w-temp mono"><span id="weatherTemp">--</span><span class="deg">掳</span></span>
   </div>
   <div class="w-right">
-    <div class="w-desc" id="weatherDesc">天气</div>
-    <div class="w-sub" id="weatherSub">体感 --° · 湿度 --% · 等待数据</div>
+    <div class="w-desc" id="weatherDesc">澶╂皵</div>
+    <div class="w-sub" id="weatherSub">浣撴劅 --掳 路 婀垮害 --% 路 绛夊緟鏁版嵁</div>
   </div>
 </div>
 
 <div class="data-alert" id="dataAlert"></div>
 
-<!-- ===== Main quota card (模块 2) ===== -->
+<!-- ===== Main quota card (妯″潡 2) ===== -->
 <div class="main-card">
   <div class="m-head sans">
     <span class="m-title">MiniMax M3</span>
-    <span class="m-plan" id="mPlan">Token Plan · <span id="mPlanName">--</span></span>
+    <span class="m-plan" id="mPlan">Token Plan 路 <span id="mPlanName">--</span></span>
   </div>
 
   <div class="m-pct mono"><span id="mPctNum">--</span><span class="pct-sign">%</span></div>
@@ -214,25 +214,25 @@ body {
   <div class="m-bar"><div class="m-bar-fill" id="mBarFill" style="width:0%"></div></div>
 
   <div class="m-tokens mono sans">
-    <span>本套餐已用</span>
+    <span>鏈椁愬凡鐢?/span>
     <span class="used" id="mPctText">--%</span>
-    <span class="sep">·</span>
-    <span class="label" id="mPctSub">实时</span>
+    <span class="sep">路</span>
+    <span class="label" id="mPctSub">瀹炴椂</span>
   </div>
 
   <div class="windows" id="windows">
     <div class="win">
-      <span class="win-name sans">5小时</span>
+      <span class="win-name sans">5灏忔椂</span>
       <span class="win-bar"><span class="win-bar-fill" data-fill="w5h" style="width:0%"></span></span>
       <span class="win-pct mono" id="w5hPct">--%</span>
     </div>
     <div class="win">
-      <span class="win-name sans">周</span>
+      <span class="win-name sans">鍛?/span>
       <span class="win-bar"><span class="win-bar-fill" data-fill="ww" style="width:0%"></span></span>
       <span class="win-pct mono" id="wwPct">--%</span>
     </div>
     <div class="win">
-      <span class="win-name sans">月</span>
+      <span class="win-name sans">鏈?/span>
       <span class="win-bar"><span class="win-bar-fill" data-fill="wm" style="width:0%"></span></span>
       <span class="win-pct mono" id="wmPct">--%</span>
     </div>
@@ -241,8 +241,8 @@ body {
 
 <!-- ===== Footer ===== -->
 <div class="footer sans">
-  <span class="label">MiniMax 用量看板</span>
-  <span id="dataStatus">等待实时数据</span>
+  <span class="label">MiniMax 鐢ㄩ噺鐪嬫澘</span>
+  <span id="dataStatus">绛夊緟瀹炴椂鏁版嵁</span>
 </div>
 
 
@@ -251,14 +251,14 @@ body {
   "updatedAt": "2026-08-14T14:01:01.717+08:00",
   "weather": {
     "ok": true,
-    "description": "闆锋毚鍐伴浌",
+    "description": "闂嗛攱姣氶崘浼存祵",
     "iconKey": "thunder",
     "tempC": 27.9,
     "feelsLikeC": 34.2,
     "humidity": 89,
     "windKph": 7.3,
-    "windDir": "涓滃寳",
-    "place": "瀹佹尝",
+    "windDir": "娑撴粌瀵?,
+    "place": "鐎逛焦灏?,
     "observedAt": "2026-08-14T14:00",
     "fetchedAt": "2026-08-14T14:01:01.714+08:00",
     "error": null
@@ -267,18 +267,18 @@ body {
     "minimax": {
       "ok": true,
       "label": "MiniMax",
-      "planName": "general 路 Token Plan",
+      "planName": "general 璺?Token Plan",
       "planTotal": null,
       "planUsed": null,
       "pct": 41,
       "windows": [
         {
-          "name": "5灏忔椂",
+          "name": "5鐏忓繑妞?,
           "usedPct": 41,
           "resetAt": "2026-08-14T15:00:00.000+08:00"
         },
         {
-          "name": "鍛?,
+          "name": "閸?,
           "usedPct": 11,
           "resetAt": "2026-08-17T00:00:00.000+08:00"
         }
@@ -306,7 +306,7 @@ body {
     latest: null,
     renderedAt: ''
   };
-  var weekdays = ['鍛ㄦ棩', '鍛ㄤ竴', '鍛ㄤ簩', '鍛ㄤ笁', '鍛ㄥ洓', '鍛ㄤ簲', '鍛ㄥ叚'];
+  var weekdays = ['閸涖劍妫?, '閸涖劋绔?, '閸涖劋绨?, '閸涖劋绗?, '閸涖劌娲?, '閸涖劋绨?, '閸涖劌鍙?];
 
   var ui = {
     find: function (id) { return doc.getElementById(id); },
@@ -371,7 +371,7 @@ body {
     var alert = ui.find('dataAlert');
 
     if (isQuiet()) {
-      ui.textNode(status, '澶滈棿鐪佺數 路 08:00 鎭㈠');
+      ui.textNode(status, '婢舵粓妫块惇浣烘暩 璺?08:00 閹垹顦?);
       ui.className(status, '');
       ui.textNode(alert, '');
       ui.className(alert, 'data-alert');
@@ -379,22 +379,22 @@ body {
     }
 
     if (!state.latest || age > 15) {
-      ui.textNode(status, '绂荤嚎 路 鏈€鍚?' + lastClock);
+      ui.textNode(status, '缁傝崵鍤?璺?閺堚偓閸?' + lastClock);
       ui.className(status, 'warn');
-      ui.textNode(alert, '鐢佃剳鎴栨暟鎹摼璺凡绂荤嚎 路 鏈€鍚庡湪绾?' + lastClock);
+      ui.textNode(alert, '閻絻鍓抽幋鏍ㄦ殶閹诡噣鎽肩捄顖氬嚒缁傝崵鍤?璺?閺堚偓閸氬骸婀痪?' + lastClock);
       ui.className(alert, 'data-alert on');
       return;
     }
 
     if (age >= 7) {
-      ui.textNode(status, '寤惰繜 ' + age + ' 鍒嗛挓 路 ' + lastClock);
+      ui.textNode(status, '瀵ゆ儼绻?' + age + ' 閸掑棝鎸?璺?' + lastClock);
       ui.className(status, 'warn');
-      ui.textNode(alert, '瀹炴椂鏁版嵁寤惰繜 ' + age + ' 鍒嗛挓 路 姝ｅ湪鏄剧ず鏈€鍚庝竴娆＄粨鏋?);
+      ui.textNode(alert, '鐎圭偞妞傞弫鐗堝祦瀵ゆ儼绻?' + age + ' 閸掑棝鎸?璺?濮濓絽婀弰鍓с仛閺堚偓閸氬簼绔村▎锛勭波閺?);
       ui.className(alert, 'data-alert on');
       return;
     }
 
-    ui.textNode(status, '瀹炴椂 路 ' + lastClock);
+    ui.textNode(status, '鐎圭偞妞?璺?' + lastClock);
     ui.className(status, '');
     ui.textNode(alert, '');
     ui.className(alert, 'data-alert');
@@ -403,7 +403,7 @@ body {
   function updateClock() {
     var now = new Date();
     ui.text('dtTime', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
-    ui.text('dtDate', now.getFullYear() + '骞? + (now.getMonth() + 1) + '鏈? + now.getDate() + '鏃?);
+    ui.text('dtDate', now.getFullYear() + '楠? + (now.getMonth() + 1) + '閺? + now.getDate() + '閺?);
     ui.text('dtWeek', weekdays[now.getDay()]);
     updateFreshness();
   }
@@ -430,7 +430,7 @@ body {
     if (percent === null || isNaN(percent)) return;
 
     percent = Math.max(0, Math.min(100, percent));
-    ui.text('batPct', (charging ? '鈿?' : '') + percent + '%');
+    ui.text('batPct', (charging ? '閳?' : '') + percent + '%');
     ui.attribute(ui.find('batFill'), 'width', Math.round(18 * percent / 100));
   }
 
@@ -455,12 +455,12 @@ body {
 
   function selectWeatherIcon(key, description) {
     var text = (String(key || '') + ' ' + String(description || '')).toLowerCase();
-    if (/thunder|闆?.test(text)) return '蠠';
-    if (/snow|闆?.test(text)) return '鉂?;
-    if (/rain|wet|闆?.test(text)) return '鈽?;
-    if (/fog|mist|haze|闆?.test(text)) return '鈮?;
-    if (/clear|sun|鏅?.test(text)) return '鈽€';
-    return '鈽?;
+    if (/thunder|闂?.test(text)) return '锠?;
+    if (/snow|闂?.test(text)) return '閴?;
+    if (/rain|wet|闂?.test(text)) return '閳?;
+    if (/fog|mist|haze|闂?.test(text)) return '閳?;
+    if (/clear|sun|閺?.test(text)) return '閳解偓';
+    return '閳?;
   }
 
   function formatTokenCount(value) {
@@ -474,41 +474,41 @@ body {
 
   function updateWeather(weather) {
     if (!weather || !weather.ok) {
-      ui.text('weatherTemp', '--掳');
-      ui.text('weatherIcon', '鈼?);
-      ui.text('weatherDesc', '澶╂皵鏈厤缃?);
-      ui.text('weatherSub', '绛夊緟涓嬫閲囬泦');
+      ui.text('weatherTemp', '--鎺?);
+      ui.text('weatherIcon', '閳?);
+      ui.text('weatherDesc', '婢垛晜鐨甸張顏堝帳缂?);
+      ui.text('weatherSub', '缁涘绶熸稉瀣偧闁插洭娉?);
       return;
     }
-    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '掳');
+    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '鎺?);
     ui.text('weatherIcon', selectWeatherIcon(weather.iconKey, weather.description));
-    ui.text('weatherDesc', String(weather.description || '澶╂皵'));
-    var feels = weather.feelsLikeC != null ? '浣撴劅 ' + Math.round(weather.feelsLikeC) + '掳' : '';
-    var hum = weather.humidity != null ? '婀垮害 ' + Math.round(weather.humidity) + '%' : '';
-    var wind = weather.windKph != null ? '椋?' + Math.round(weather.windKph) + 'km/h' : '';
-    var place = weather.place ? '路 ' + weather.place : '';
-    var sub = [feels, hum, wind + (place ? ' ' + place : '')].filter(Boolean).join(' 路 ');
+    ui.text('weatherDesc', String(weather.description || '婢垛晜鐨?));
+    var feels = weather.feelsLikeC != null ? '娴ｆ挻鍔?' + Math.round(weather.feelsLikeC) + '鎺? : '';
+    var hum = weather.humidity != null ? '濠€鍨 ' + Math.round(weather.humidity) + '%' : '';
+    var wind = weather.windKph != null ? '妞?' + Math.round(weather.windKph) + 'km/h' : '';
+    var place = weather.place ? '璺?' + weather.place : '';
+    var sub = [feels, hum, wind + (place ? ' ' + place : '')].filter(Boolean).join(' 璺?');
     ui.text('weatherSub', sub || ' ');
   }
 
   function remainingText(value) {
     var remaining = timestamp(value) - Date.now();
     if (!value || !remaining) return '';
-    if (remaining <= 0) return '鈫?鍗冲皢鍒锋柊';
+    if (remaining <= 0) return '閳?閸楀啿鐨㈤崚閿嬫煀';
     var minutes = Math.ceil(remaining / 60000);
     var days = Math.floor(minutes / 1440);
     var hours = Math.floor((minutes % 1440) / 60);
     minutes %= 60;
-    if (days) return '鈫?' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
-    if (hours) return '鈫?' + hours + 'h' + twoDigits(minutes) + 'm';
-    return '鈫?' + minutes + 'm';
+    if (days) return '閳?' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
+    if (hours) return '閳?' + hours + 'h' + twoDigits(minutes) + 'm';
+    return '閳?' + minutes + 'm';
   }
 
   function windowLabel(name) {
     var text = String(name || '');
-    if (/5灏忔椂|5H/i.test(text)) return { id: 'w5hPct', fill: 'w5h' };
-    if (/7澶﹟鍛▅WEEK/i.test(text)) return { id: 'wwPct', fill: 'ww' };
-    if (/鏈坾MONTH/i.test(text)) return { id: 'wmPct', fill: 'wm' };
+    if (/5鐏忓繑妞倈5H/i.test(text)) return { id: 'w5hPct', fill: 'w5h' };
+    if (/7婢讹篃閸涒枀WEEK/i.test(text)) return { id: 'wwPct', fill: 'ww' };
+    if (/閺堝澗MONTH/i.test(text)) return { id: 'wmPct', fill: 'wm' };
     return null;
   }
 
@@ -516,8 +516,8 @@ body {
     if (!source || !source.ok) {
       ui.text('mPctNum', '--');
       ui.text('mPctText', '--%');
-      ui.text('mPlanName', '绛夊緟鏁版嵁');
-      ui.text('mPctSub', '瀹炴椂');
+      ui.text('mPlanName', '缁涘绶熼弫鐗堝祦');
+      ui.text('mPctSub', '鐎圭偞妞?);
       ui.style(ui.find('mBarFill'), 'width', '0%');
       ['w5hPct', 'wwPct', 'wmPct'].forEach(function (id) {
         ui.text(id, '--%');
@@ -534,7 +534,7 @@ body {
     ui.text('mPctText', String(Math.round(pct)) + '%');
     ui.text('mPlanName', String(source.planName || source.label || 'Token Plan'));
     ui.style(ui.find('mBarFill'), 'width', pct + '%');
-    ui.text('mPctSub', '瀹炴椂');
+    ui.text('mPctSub', '鐎圭偞妞?);
 
     var windows = Array.isArray(source.windows) ? source.windows : [];
     var usedFills = {};
@@ -628,7 +628,7 @@ body {
     setTimeout(function () {
       updateClock();
       scheduleMinuteClock();
-  // === 禁屏保 ===
+  // === 绂佸睆淇?===
   function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
   setInterval(keepAwake, 60*1000);
   setTimeout(keepAwake, 5000);
@@ -642,7 +642,7 @@ body {
   if (!isQuiet()) refresh();
   scheduleRefresh();
   scheduleMinuteClock();
-  // === 禁屏保 ===
+  // === 绂佸睆淇?===
   function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
   setInterval(keepAwake, 60*1000);
   setTimeout(keepAwake, 5000);
