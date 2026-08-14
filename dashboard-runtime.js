@@ -1,4 +1,4 @@
-(function (win, doc) {
+﻿(function (win, doc) {
   'use strict';
 
   var settings = {
@@ -109,10 +109,21 @@
   }
 
   function updateClock() {
+    // 时区安全: 从 ISO 字符串直接抽时:分 (数据时间是 +08:00 北京)
+    var last = state.latest && state.latest.updatedAt;
     var now = new Date();
-    ui.text('dtTime', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
-    ui.text('dtDate', now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日');
-    ui.text('dtWeek', weekdays[now.getDay()]);
+    var h = '--', m = '--', dateText = '', wk = '';
+    if (last) {
+      var t = last.match(/T(\d{2}):(\d{2}):/);
+      var d = last.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (t) { h = t[1]; m = t[2]; }
+      if (d) { dateText = parseInt(d[1]) + '年' + parseInt(d[2]) + '月' + parseInt(d[3]) + '日'; wk = weekdays[new Date(last).getDay()]; }
+    }
+    ui.text('dtTime', h + ':' + m);
+    ui.text('dtDate', dateText);
+    ui.text('dtWeek', wk);
+    // 副显 Kindle 本地时钟
+    ui.text('dtLocal', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
     updateFreshness();
   }
 
@@ -346,3 +357,19 @@
   scheduleRefresh();
   scheduleMinuteClock();
 }(window, document));
+
+  // 每 30 分钟后台拉新 data.js
+  setInterval(function () {
+    var s = doc.createElement('script');
+    s.async = true;
+    s.src = (state.endpoint || 'data.js') + '?t=' + Date.now();
+    s.onload = function () {
+      if (s.parentNode) s.parentNode.removeChild(s);
+      if (win.DASH_DATA && win.DASH_DATA.updatedAt) {
+        present(win.DASH_DATA);
+        updateClock();
+      }
+    };
+    s.onerror = function () { if (s.parentNode) s.parentNode.removeChild(s); };
+    doc.getElementsByTagName('head')[0].appendChild(s);
+  }, 30 * 60 * 1000);
