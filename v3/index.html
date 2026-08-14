@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<meta http-equiv="refresh" content="600"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>MiniMax 鐢ㄩ噺 路 Kindle</title>
+<style>
+:root {
+  --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
+  --faint: #AAAAAA; --border: #888888; --border-light: #CCCCCC;
+  --bar-bg: #E0E0E0; --bar-fill: #000000; --card-bg: #F6F6F6;
+  --accent: #1A1A1A;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212; --fg: #EAEAEA; --mid: #B0B0B0; --light: #808080;
+    --faint: #4A4A4A; --border: #2E2E2E; --border-light: #1F1F1F;
+    --bar-bg: #262626; --bar-fill: #DADADA; --card-bg: #1A1A1A;
+    --accent: #FAFAFA;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212; --fg: #EAEAEA; --mid: #B0B0B0; --light: #808080;
+  --faint: #4A4A4A; --border: #2E2E2E; --border-light: #1F1F1F;
+  --bar-bg: #262626; --bar-fill: #DADADA; --card-bg: #1A1A1A;
+  --accent: #FAFAFA;
+}
+:root[data-theme="light"] {
+  --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
+  --faint: #AAAAAA; --border: #888888; --border-light: #CCCCCC;
+  --bar-bg: #E0E0E0; --bar-fill: #000000; --card-bg: #F6F6F6;
+  --accent: #1A1A1A;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: Georgia, 'Noto Serif SC', 'SimSun', serif;
+  background: var(--bg); color: var(--fg);
+  position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+  width: 100vw; max-width: 600px; height: calc(100vh - 60px); max-height: 740px;
+  margin: 0 auto; padding: 10px 18px 8px; display: flex; flex-direction: column;
+  line-height: 1.3; gap: 5px; box-sizing: border-box; overflow: hidden;
+}
+.sans { font-family: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif; }
+.mono { font-family: 'Consolas', 'Courier New', monospace; font-variant-numeric: tabular-nums; }
+
+/* ===== Top status row ===== */
+.top-row {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; color: var(--mid);
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+.top-row .time { font-size: 16px; color: var(--fg); font-weight: 600; }
+.top-row .date { margin-left: 8px; }
+.top-row .week { margin-left: 6px; color: var(--light); }
+.top-row .batt { display: flex; align-items: center; gap: 4px; color: var(--light); }
+.top-row .batt svg { width: 18px; height: 12px; }
+
+/* ===== Weather card (鐙珛妯″潡) ===== */
+.weather-card {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  padding: 10px 14px;\n  flex-shrink: 0;
+}
+.w-left {
+  display: flex; align-items: center; gap: 6px;
+}
+.w-icon { font-size: 30px; line-height: 1; color: var(--mid); }
+.w-temp { font-size: 28px; font-weight: 700; line-height: 1; color: var(--fg); }
+.w-temp .deg { font-size: 18px; font-weight: 600; vertical-align: top; }
+.w-right { color: var(--mid); font-size: 14px; }
+.w-desc { font-size: 16px; color: var(--fg); font-weight: 600; margin-bottom: 3px; }
+.w-sub { color: var(--light); font-size: 12px; line-height: 1.4; }
+
+/* ===== Main quota card ===== */
+.main-card {
+  flex: 1 1 auto;
+  border: 2px solid var(--border);
+  background: var(--card-bg);
+  padding: 10px 18px 12px;
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.m-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+}
+.m-title {
+  font-size: 22px; font-weight: 700; color: var(--fg);
+  letter-spacing: 0.02em;
+}
+.m-plan {
+  font-size: 13px; color: var(--light);
+}
+
+.m-pct {
+  text-align: center;
+  font-size: 76px; font-weight: 800;
+  line-height: 1;
+  color: var(--accent);
+  margin: 2px 0 10px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+.m-pct .pct-sign { font-size: 38px; font-weight: 700; vertical-align: top; margin-left: 2px; }
+
+.m-bar {
+  height: 10px;\n  background: var(--bar-bg);
+  border: 1px solid var(--border);
+  margin: 0 0 8px;
+  flex-shrink: 0;
+}
+.m-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.m-tokens {
+  text-align: center;
+  font-size: 15px; color: var(--mid);
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.m-tokens .used { color: var(--fg); font-weight: 600; }
+.m-tokens .sep { color: var(--faint); margin: 0 6px; }
+.m-tokens .label { color: var(--light); font-size: 13px; margin-left: 4px; }
+
+.windows {
+  border-top: 1px solid var(--border-light);
+  padding-top: 10px;
+  margin-top: auto;
+  flex-shrink: 0;
+}
+.win {
+  display: grid;
+  grid-template-columns: 60px 1fr 64px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.win:last-child { margin-bottom: 0; }
+.win-name { color: var(--light); letter-spacing: 0.04em; font-weight: 600; }
+.win-bar { height: 14px; background: var(--bar-bg); border: 1px solid var(--border); }
+.win-bar-fill { height: 100%; background: var(--accent); }
+.win-pct { text-align: right; font-weight: 700; color: var(--fg); font-variant-numeric: tabular-nums; font-size: 14px; }
+.win-reset { grid-column: 2 / 4; font-size: 11px; color: var(--light); text-align: right; margin-top: -6px; }
+
+/* ===== Footer ===== */
+.footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 4px;
+  font-size: 11px; color: var(--light);
+  flex-shrink: 0;
+}
+.footer .label { font-weight: 600; }
+.footer .warn { color: var(--fg); font-weight: 700; }
+
+.data-alert {
+  display: none; margin: 0; padding: 4px 8px;
+  border: 2px solid var(--fg); text-align: center;
+  font: 700 12px/1.3 Arial, 'Microsoft YaHei', sans-serif;
+  color: var(--bg); background: var(--fg);
+  flex-shrink: 0;
+}
+.data-alert.on { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ===== Top status row ===== -->
+<div class="top-row sans">
+  <div>
+    <span class="time mono" id="dtTime">--:--</span><span class="local mono" id="dtLocal" style="font-size:11px;color:#aaa;margin-left:4px"></span>
+    <span class="date" id="dtDate">----骞?-鏈?-鏃?/span>
+    <span class="week" id="dtWeek">---</span>
+  </div>
+  <div class="batt" id="dtBattery">
+    <svg viewBox="-0.5 0 28 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="0" y="1" width="22" height="12" rx="2"/><rect x="22" y="4" width="3" height="6" rx="1"/><rect x="2" y="3" width="11" height="8" fill="currentColor" stroke="none" id="batFill"/></svg>
+    <span id="batPct">--%</span>
+  </div>
+</div>
+
+<!-- ===== Weather card (妯″潡 1) ===== -->
+<div class="weather-card sans">
+  <div class="w-left">
+    <span class="w-icon" id="weatherIcon">鈽€</span>
+    <span class="w-temp mono"><span id="weatherTemp">--</span><span class="deg">掳</span></span>
+  </div>
+  <div class="w-right">
+    <div class="w-desc" id="weatherDesc">澶╂皵</div>
+    <div class="w-sub" id="weatherSub">浣撴劅 --掳 路 婀垮害 --% 路 绛夊緟鏁版嵁</div>
+  </div>
+</div>
+
+<div class="data-alert" id="dataAlert"></div>
+
+<!-- ===== Main quota card (妯″潡 2) ===== -->
+<div class="main-card">
+  <div class="m-head sans">
+    <span class="m-title">MiniMax M3</span>
+    <span class="m-plan" id="mPlan">Token Plan 路 <span id="mPlanName">--</span></span>
+  </div>
+
+  <div class="m-pct mono"><span id="mPctNum">--</span><span class="pct-sign">%</span></div>
+
+  <div class="m-bar"><div class="m-bar-fill" id="mBarFill" style="width:0%"></div></div>
+
+  <div class="m-tokens mono sans">
+    <span>鏈椁愬凡鐢?/span>
+    <span class="used" id="mPctText">--%</span>
+    <span class="sep">路</span>
+    <span class="label" id="mPctSub">瀹炴椂</span>
+  </div>
+
+  <div class="windows" id="windows">
+    <div class="win">
+      <span class="win-name sans">5灏忔椂</span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="w5h" style="width:0%"></span></span>
+      <span class="win-pct mono" id="w5hPct">--%</span>
+    </div>
+    <div class="win">
+      <span class="win-name sans">鍛?/span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="ww" style="width:0%"></span></span>
+      <span class="win-pct mono" id="wwPct">--%</span>
+    </div>
+    <div class="win">
+      <span class="win-name sans">鏈?/span>
+      <span class="win-bar"><span class="win-bar-fill" data-fill="wm" style="width:0%"></span></span>
+      <span class="win-pct mono" id="wmPct">--%</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Footer ===== -->
+<div class="footer sans">
+  <span class="label">MiniMax 鐢ㄩ噺鐪嬫澘</span>
+  <span id="dataStatus">绛夊緟瀹炴椂鏁版嵁</span>
+</div>
+
+
+
+<script>window.DASH_DATA = {
+  "updatedAt": "2026-08-14T14:01:01.717+08:00",
+  "weather": {
+    "ok": true,
+    "description": "闂嗛攱姣氶崘浼存祵",
+    "iconKey": "thunder",
+    "tempC": 27.9,
+    "feelsLikeC": 34.2,
+    "humidity": 89,
+    "windKph": 7.3,
+    "windDir": "娑撴粌瀵?,
+    "place": "鐎逛焦灏?,
+    "observedAt": "2026-08-14T14:00",
+    "fetchedAt": "2026-08-14T14:01:01.714+08:00",
+    "error": null
+  },
+  "sources": {
+    "minimax": {
+      "ok": true,
+      "label": "MiniMax",
+      "planName": "general 璺?Token Plan",
+      "planTotal": null,
+      "planUsed": null,
+      "pct": 41,
+      "windows": [
+        {
+          "name": "5鐏忓繑妞?,
+          "usedPct": 41,
+          "resetAt": "2026-08-14T15:00:00.000+08:00"
+        },
+        {
+          "name": "閸?,
+          "usedPct": 11,
+          "resetAt": "2026-08-17T00:00:00.000+08:00"
+        }
+      ],
+      "fetchedAt": "2026-08-14T14:00:58.732+08:00",
+      "error": null
+    }
+  }
+};
+;</script>
+<script>
+(function (win, doc) {
+  'use strict';
+
+  var settings = {
+    fallbackData: 'https://singledog65.github.io/kindle-ai-quota-dashboard/data.js',
+    endpointPointer: 'live-endpoint.js',
+    pollEvery: 3 * 60 * 1000,
+    pollOffset: 5000,
+    quietStart: 3,
+    quietEnd: 8
+  };
+  var state = {
+    endpoint: win.DASH_LIVE_ENDPOINT || settings.fallbackData,
+    latest: null,
+    renderedAt: ''
+  };
+  var weekdays = ['閸涖劍妫?, '閸涖劋绔?, '閸涖劋绨?, '閸涖劋绗?, '閸涖劌娲?, '閸涖劋绨?, '閸涖劌鍙?];
+
+  var ui = {
+    find: function (id) { return doc.getElementById(id); },
+    textNode: function (node, value) {
+      var next = String(value);
+      if (node && node.textContent !== next) node.textContent = next;
+    },
+    text: function (id, value) {
+      ui.textNode(ui.find(id), value);
+    },
+    html: function (node, value) {
+      if (node && node.innerHTML !== value) node.innerHTML = value;
+    },
+    className: function (node, value) {
+      if (node && node.className !== value) node.className = value;
+    },
+    style: function (node, name, value) {
+      if (node && node.style[name] !== value) node.style[name] = value;
+    },
+    attribute: function (node, name, value) {
+      var next = String(value);
+      if (node && node.getAttribute(name) !== next) node.setAttribute(name, next);
+    }
+  };
+
+  function twoDigits(value) {
+    return value < 10 ? '0' + value : String(value);
+  }
+
+  function timestamp(value) {
+    var parsed = Date.parse(value || '');
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  function clockText(value) {
+    var date = new Date(value);
+    if (isNaN(date.getTime())) return '--:--';
+    return twoDigits(date.getHours()) + ':' + twoDigits(date.getMinutes());
+  }
+
+  function isQuiet(date) {
+    var hour = (date || new Date()).getHours();
+    return hour >= settings.quietStart && hour < settings.quietEnd;
+  }
+
+  function millisecondsUntilMorning(date) {
+    var now = date || new Date();
+    var morning = new Date(
+      now.getFullYear(), now.getMonth(), now.getDate(),
+      settings.quietEnd, 0, 5, 0
+    );
+    return Math.max(1000, morning.getTime() - now.getTime());
+  }
+
+  function updateFreshness() {
+    var lastUpdate = state.latest && state.latest.updatedAt;
+    var age = lastUpdate
+      ? Math.floor((Date.now() - timestamp(lastUpdate)) / 60000)
+      : 99999;
+    var lastClock = clockText(lastUpdate);
+    var status = ui.find('dataStatus');
+    var alert = ui.find('dataAlert');
+
+    if (isQuiet()) {
+      ui.textNode(status, '婢舵粓妫块惇浣烘暩 璺?08:00 閹垹顦?);
+      ui.className(status, '');
+      ui.textNode(alert, '');
+      ui.className(alert, 'data-alert');
+      return;
+    }
+
+    if (!state.latest || age > 15) {
+      ui.textNode(status, '缁傝崵鍤?璺?閺堚偓閸?' + lastClock);
+      ui.className(status, 'warn');
+      ui.textNode(alert, '閻絻鍓抽幋鏍ㄦ殶閹诡噣鎽肩捄顖氬嚒缁傝崵鍤?璺?閺堚偓閸氬骸婀痪?' + lastClock);
+      ui.className(alert, 'data-alert on');
+      return;
+    }
+
+    if (age >= 7) {
+      ui.textNode(status, '瀵ゆ儼绻?' + age + ' 閸掑棝鎸?璺?' + lastClock);
+      ui.className(status, 'warn');
+      ui.textNode(alert, '鐎圭偞妞傞弫鐗堝祦瀵ゆ儼绻?' + age + ' 閸掑棝鎸?璺?濮濓絽婀弰鍓с仛閺堚偓閸氬簼绔村▎锛勭波閺?);
+      ui.className(alert, 'data-alert on');
+      return;
+    }
+
+    ui.textNode(status, '鐎圭偞妞?璺?' + lastClock);
+    ui.className(status, '');
+    ui.textNode(alert, '');
+    ui.className(alert, 'data-alert');
+  }
+
+  function updateClock() {
+    var now = new Date();
+    ui.text('dtTime', twoDigits(now.getHours()) + ':' + twoDigits(now.getMinutes()));
+    ui.text('dtDate', now.getFullYear() + '楠? + (now.getMonth() + 1) + '閺? + now.getDate() + '閺?);
+    ui.text('dtWeek', weekdays[now.getDay()]);
+    updateFreshness();
+  }
+
+  function queryValue(name) {
+    var match = String(location.search || '').match(
+      new RegExp('[?&]' + name + '=([^&]*)')
+    );
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+
+  function updateBattery() {
+    var percentText = queryValue('battery');
+    var chargeText = queryValue('charging');
+    var percent = percentText !== null ? Number(percentText) : null;
+    var charging = chargeText === '1';
+    var device = win.KINDLE_DEVICE;
+
+    if (device) {
+      if (typeof device.battery === 'number') percent = device.battery;
+      if (typeof device.charging === 'boolean') charging = device.charging;
+      if (device.charging === 0 || device.charging === 1) charging = device.charging === 1;
+    }
+    if (percent === null || isNaN(percent)) return;
+
+    percent = Math.max(0, Math.min(100, percent));
+    ui.text('batPct', (charging ? '閳?' : '') + percent + '%');
+    ui.attribute(ui.find('batFill'), 'width', Math.round(18 * percent / 100));
+  }
+
+  function attachScript(url, onSuccess, onFailure) {
+    var script = doc.createElement('script');
+    script.async = true;
+    script.src = url;
+    script.onload = function () {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (onSuccess) onSuccess();
+    };
+    script.onerror = function () {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (onFailure) onFailure();
+    };
+    doc.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  function requestDeviceStatus() {
+    attachScript('device-status.js?_=' + Date.now(), updateBattery);
+  }
+
+  function selectWeatherIcon(key, description) {
+    var text = (String(key || '') + ' ' + String(description || '')).toLowerCase();
+    if (/thunder|闂?.test(text)) return '锠?;
+    if (/snow|闂?.test(text)) return '閴?;
+    if (/rain|wet|闂?.test(text)) return '閳?;
+    if (/fog|mist|haze|闂?.test(text)) return '閳?;
+    if (/clear|sun|閺?.test(text)) return '閳解偓';
+    return '閳?;
+  }
+
+  function formatTokenCount(value) {
+    var n = Number(value);
+    if (!isFinite(n) || n < 0) return '--';
+    if (n >= 1e9) return (n / 1e9).toFixed(2).replace(/\.?0+$/, '') + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(2).replace(/\.?0+$/, '') + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.?0+$/, '') + 'K';
+    return String(Math.round(n));
+  }
+
+  function updateWeather(weather) {
+    if (!weather || !weather.ok) {
+      ui.text('weatherTemp', '--鎺?);
+      ui.text('weatherIcon', '閳?);
+      ui.text('weatherDesc', '婢垛晜鐨甸張顏堝帳缂?);
+      ui.text('weatherSub', '缁涘绶熸稉瀣偧闁插洭娉?);
+      return;
+    }
+    ui.text('weatherTemp', Math.round(Number(weather.tempC)) + '鎺?);
+    ui.text('weatherIcon', selectWeatherIcon(weather.iconKey, weather.description));
+    ui.text('weatherDesc', String(weather.description || '婢垛晜鐨?));
+    var feels = weather.feelsLikeC != null ? '娴ｆ挻鍔?' + Math.round(weather.feelsLikeC) + '鎺? : '';
+    var hum = weather.humidity != null ? '濠€鍨 ' + Math.round(weather.humidity) + '%' : '';
+    var wind = weather.windKph != null ? '妞?' + Math.round(weather.windKph) + 'km/h' : '';
+    var place = weather.place ? '璺?' + weather.place : '';
+    var sub = [feels, hum, wind + (place ? ' ' + place : '')].filter(Boolean).join(' 璺?');
+    ui.text('weatherSub', sub || ' ');
+  }
+
+  function remainingText(value) {
+    var remaining = timestamp(value) - Date.now();
+    if (!value || !remaining) return '';
+    if (remaining <= 0) return '閳?閸楀啿鐨㈤崚閿嬫煀';
+    var minutes = Math.ceil(remaining / 60000);
+    var days = Math.floor(minutes / 1440);
+    var hours = Math.floor((minutes % 1440) / 60);
+    minutes %= 60;
+    if (days) return '閳?' + days + 'd' + (hours ? ' ' + hours + 'h' : '');
+    if (hours) return '閳?' + hours + 'h' + twoDigits(minutes) + 'm';
+    return '閳?' + minutes + 'm';
+  }
+
+  function windowLabel(name) {
+    var text = String(name || '');
+    if (/5鐏忓繑妞倈5H/i.test(text)) return { id: 'w5hPct', fill: 'w5h' };
+    if (/7婢讹篃閸涒枀WEEK/i.test(text)) return { id: 'wwPct', fill: 'ww' };
+    if (/閺堝澗MONTH/i.test(text)) return { id: 'wmPct', fill: 'wm' };
+    return null;
+  }
+
+  function updateMainCard(source) {
+    if (!source || !source.ok) {
+      ui.text('mPctNum', '--');
+      ui.text('mPctText', '--%');
+      ui.text('mPlanName', '缁涘绶熼弫鐗堝祦');
+      ui.text('mPctSub', '鐎圭偞妞?);
+      ui.style(ui.find('mBarFill'), 'width', '0%');
+      ['w5hPct', 'wwPct', 'wmPct'].forEach(function (id) {
+        ui.text(id, '--%');
+      });
+      var emptyFills = doc.querySelectorAll('[data-fill]');
+      for (var i = 0; i < emptyFills.length; i += 1) {
+        ui.style(emptyFills[i], 'width', '0%');
+      }
+      return;
+    }
+
+    var pct = Math.max(0, Math.min(100, Number(source.pct) || 0));
+    ui.text('mPctNum', String(Math.round(pct)));
+    ui.text('mPctText', String(Math.round(pct)) + '%');
+    ui.text('mPlanName', String(source.planName || source.label || 'Token Plan'));
+    ui.style(ui.find('mBarFill'), 'width', pct + '%');
+    ui.text('mPctSub', '鐎圭偞妞?);
+
+    var windows = Array.isArray(source.windows) ? source.windows : [];
+    var usedFills = {};
+    for (var w = 0; w < windows.length; w += 1) {
+      var win = windows[w];
+      var slot = windowLabel(win.name);
+      if (!slot) continue;
+      var wPct = Math.max(0, Math.min(100, Number(win.usedPct) || 0));
+      ui.text(slot.id, String(Math.round(wPct)) + '%');
+      usedFills[slot.fill] = wPct;
+    }
+    var allFills = doc.querySelectorAll('[data-fill]');
+    for (var f = 0; f < allFills.length; f += 1) {
+      var key = allFills[f].getAttribute('data-fill');
+      var val = usedFills[key];
+      ui.style(allFills[f], 'width', (val != null ? val : 0) + '%');
+    }
+  }
+
+  function present(data) {
+    if (!data || !data.updatedAt || !data.sources) return;
+    if (state.renderedAt && timestamp(data.updatedAt) < timestamp(state.renderedAt)) return;
+
+    state.latest = data;
+    if (data.updatedAt !== state.renderedAt) {
+      state.renderedAt = data.updatedAt;
+      updateWeather(data.weather);
+      updateMainCard(data.sources.minimax);
+    }
+    updateFreshness();
+  }
+
+  function requestData(url, canFallback) {
+    var separator;
+    if (!url || url.indexOf('__LIVE_') === 0) return;
+    separator = url.indexOf('?') < 0 ? '?' : '&';
+    attachScript(
+      url + separator + '_=' + Date.now(),
+      function () { present(win.DASH_DATA); },
+      function () {
+        if (canFallback && url !== settings.fallbackData) {
+          requestData(settings.fallbackData, false);
+        }
+      }
+    );
+  }
+
+  function refresh() {
+    requestDeviceStatus();
+    attachScript(
+      settings.endpointPointer + '?_=' + Date.now(),
+      function () {
+        var supplied = win.DASH_LIVE_ENDPOINT || '';
+        if (supplied && supplied.indexOf('__LIVE_') !== 0) state.endpoint = supplied;
+        requestData(state.endpoint, true);
+      },
+      function () {
+        state.endpoint = settings.fallbackData;
+        requestData(state.endpoint, false);
+      }
+    );
+  }
+
+  function scheduleRefresh() {
+    var now = new Date();
+    var milliseconds = now.getTime();
+    var delay;
+
+    if (isQuiet(now)) {
+      delay = millisecondsUntilMorning(now);
+    } else {
+      delay = (
+        settings.pollOffset -
+        (milliseconds % settings.pollEvery) +
+        settings.pollEvery
+      ) % settings.pollEvery;
+      if (delay < 250) delay += settings.pollEvery;
+    }
+
+    setTimeout(function () {
+      if (!isQuiet()) refresh();
+      scheduleRefresh();
+    }, delay);
+  }
+
+  function scheduleMinuteClock() {
+    var now = new Date();
+    var delay = isQuiet(now)
+      ? millisecondsUntilMorning(now)
+      : 60000 - (now.getTime() % 60000) + 100;
+    setTimeout(function () {
+      updateClock();
+      scheduleMinuteClock();
+  // === 绂佸睆淇?===
+  function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
+  setInterval(keepAwake, 60*1000);
+  setTimeout(keepAwake, 5000);
+
+    }, delay);
+  }
+
+  present(win.DASH_DATA);
+  updateClock();
+  updateBattery();
+  if (!isQuiet()) refresh();
+  scheduleRefresh();
+  scheduleMinuteClock();
+  // === 绂佸睆淇?===
+  function keepAwake() { try { if (window.kindle && kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo(); if (window.nativeBridge && nativeBridge.setLipcProperty) { try { nativeBridge.setLipcProperty('com.lab126.powerd','preventScreenSaver',1); } catch(e){} } try { window.dispatchEvent(new Event('focus')); } catch(e){} } catch(e){} }
+  setInterval(keepAwake, 60*1000);
+  setTimeout(keepAwake, 5000);
+
+}(window, document));
+
+</script>
+</body>
+</html>
