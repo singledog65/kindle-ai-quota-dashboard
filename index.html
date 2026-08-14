@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-<meta http-equiv="refresh" content="1800"><title>MiniMax 用量 · Kindle</title>
+<meta http-equiv="refresh" content="1800"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>MiniMax 用量 · Kindle</title>
 <style>
 :root {
   --bg: #FFFFFF; --fg: #000000; --mid: #444444; --light: #777777;
@@ -638,6 +638,25 @@ body {
     setTimeout(function () {
       updateClock();
       scheduleMinuteClock();
+  // === 禁屏保: 多管齐下 ===
+  function keepAwake() {
+    try {
+      // 1) 通知框架"页面活动" (原生 Bridge)
+      if (window.kindle && window.kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo();
+      // 2) 通过 nativeBridge 设 LIPC preventScreenSaver=1
+      if (window.nativeBridge && nativeBridge.setLipcProperty) {
+        try { nativeBridge.setLipcProperty('com.lab126.powerd', 'preventScreenSaver', 1); } catch(e) {}
+      }
+      // 3) 微小 DOM 操作让浏览器认为页面活动
+      try { document.title = document.title; } catch(e) {}
+      // 4) 触发一个 noop 滚动或 hover (e-ink 友好)
+      try { window.dispatchEvent(new Event('focus')); } catch(e) {}
+    } catch(e) {}
+  }
+  // 每 60 秒打一次招呼
+  setInterval(keepAwake, 60 * 1000);
+  // 页面加载后立刻打一次
+  setTimeout(keepAwake, 5000);
     }, delay);
   }
 
@@ -647,6 +666,25 @@ body {
   if (!isQuiet()) refresh();
   scheduleRefresh();
   scheduleMinuteClock();
+  // === 禁屏保: 多管齐下 ===
+  function keepAwake() {
+    try {
+      // 1) 通知框架"页面活动" (原生 Bridge)
+      if (window.kindle && window.kindle.appmgr && kindle.appmgr.ongo) kindle.appmgr.ongo();
+      // 2) 通过 nativeBridge 设 LIPC preventScreenSaver=1
+      if (window.nativeBridge && nativeBridge.setLipcProperty) {
+        try { nativeBridge.setLipcProperty('com.lab126.powerd', 'preventScreenSaver', 1); } catch(e) {}
+      }
+      // 3) 微小 DOM 操作让浏览器认为页面活动
+      try { document.title = document.title; } catch(e) {}
+      // 4) 触发一个 noop 滚动或 hover (e-ink 友好)
+      try { window.dispatchEvent(new Event('focus')); } catch(e) {}
+    } catch(e) {}
+  }
+  // 每 60 秒打一次招呼
+  setInterval(keepAwake, 60 * 1000);
+  // 页面加载后立刻打一次
+  setTimeout(keepAwake, 5000);
 }(window, document));
 
   // 每 30 分钟后台拉新 data.js
